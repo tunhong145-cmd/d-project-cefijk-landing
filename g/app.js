@@ -4,9 +4,9 @@
   var SUPABASE_URL = 'https://sfiflidnsrdotoidvcmh.supabase.co';
   var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_F9QbR2X9iJp62lf3aJnh8w_NXlYl3aD';
 var LANDING_VARIANT = 'G';
-  var repositoryPixelsReady = window.RepoPixels ? window.RepoPixels.load(LANDING_VARIANT) : Promise.resolve([]);
+  var IS_LOCAL_PREVIEW = window.location.protocol === 'file:' || /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+  var repositoryPixelsReady = !IS_LOCAL_PREVIEW && window.RepoPixels ? window.RepoPixels.load(LANDING_VARIANT) : Promise.resolve([]);
 var STORAGE_KEY = 'd_project_g_selected_amount';
-  var IS_LOCAL_PREVIEW = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
   var ENTERPRISE_LINE_URL = '#';
   var initializedPixelIds = {};
   var pageViewTracked = false;
@@ -226,7 +226,7 @@ var STORAGE_KEY = 'd_project_g_selected_amount';
     applyLineConfig();
   }
 
-  var siteConfigPromise = loadSiteConfig();
+  var siteConfigPromise = IS_LOCAL_PREVIEW ? Promise.resolve() : loadSiteConfig();
 
   function detectClientDevice(userAgent) {
     var ua = String(userAgent || '');
@@ -276,7 +276,7 @@ var STORAGE_KEY = 'd_project_g_selected_amount';
     return metadata;
   }
 
-  var clientMetadataPromise = collectClientMetadata();
+  var clientMetadataPromise = IS_LOCAL_PREVIEW ? Promise.resolve({}) : collectClientMetadata();
 
   function showFieldError(name, text) {
     var error = document.querySelector('[data-error-for="' + name + '"]');
