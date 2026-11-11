@@ -8,6 +8,7 @@ var LANDING_VARIANT = 'G';
   var repositoryPixelsReady = !IS_LOCAL_PREVIEW && window.RepoPixels ? window.RepoPixels.load(LANDING_VARIANT) : Promise.resolve([]);
 var STORAGE_KEY = 'd_project_g_selected_amount';
   var ENTERPRISE_LINE_URL = '#';
+  var applicationQuery = new URLSearchParams(window.location.search);
   var initializedPixelIds = {};
   var pageViewTracked = false;
   var submittedApplicantName = '';
@@ -92,8 +93,14 @@ var STORAGE_KEY = 'd_project_g_selected_amount';
   }
 
   function bindCalculator() {
-    var restored = Number(safeSessionGet(STORAGE_KEY));
-    if (!IS_LOCAL_PREVIEW && restored >= 5 && restored <= 300 && restored % 5 === 0) $('#amount').value = String(restored * 10000);
+    var linkedAmount = applicationQuery.get('amount');
+    var linkedBands = {
+      '5萬-10萬': 10, '10萬-30萬': 20, '30萬-50萬': 40, '50萬以上': 75,
+      '10萬-20萬': 20, '20萬-30萬': 25, '50萬-100萬': 75
+    };
+    var restored = IS_LOCAL_PREVIEW ? 0 : Number(safeSessionGet(STORAGE_KEY));
+    if (Object.prototype.hasOwnProperty.call(linkedBands, linkedAmount)) restored = linkedBands[linkedAmount];
+    if (restored >= 5 && restored <= 300 && restored % 5 === 0) $('#amount').value = String(restored * 10000);
     $('#amount').addEventListener('input', renderCalculator);
     $all('[data-term]').forEach(function (button) {
       button.addEventListener('click', function () {
@@ -422,6 +429,7 @@ var STORAGE_KEY = 'd_project_g_selected_amount';
 
     $('#apply').addEventListener('click', openApply);
     if (closeButton) closeButton.addEventListener('click', closeApply);
+    if (applicationQuery.has('amount') || applicationQuery.getAll('view').includes('apply')) openApply();
   }
 
   function bindReviews() {
@@ -498,6 +506,7 @@ var STORAGE_KEY = 'd_project_g_selected_amount';
         $('#line-name-to-send').textContent = submittedApplicantName;
         $('#application').hidden = true;
         var localSuccess = $('#success');
+        $('#copy-line-name-status').textContent = '本地預覽：未送出資料，不會開啟 LINE。';
         localSuccess.hidden = false;
         localSuccess.focus({ preventScroll: true });
         return;

@@ -5,14 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <title>資金需求線上評估</title>
-  <script>
-    (function () {
-      var target = './' + window.location.search + window.location.hash;
-      window.location.replace(target);
-    }());
-  </script>
 </head>
 <body>
-  <p><a href="./">前往資金需求線上評估</a></p>
+  <p>若未自動轉跳，請<a id="application-link" href="index.html?view=apply">前往申請表單</a>。</p>
+  <script>
+    (function () {
+      var target = new URL('index.html', window.location.href);
+      target.search = window.location.search;
+      target.hash = window.location.hash;
+      var params = target.searchParams;
+      if (params.getAll('view').indexOf('apply') === -1) params.append('view', 'apply');
+      document.getElementById('application-link').href = target.href;
+      window.location.replace(target.href);
+    }());
+  </script>
 </body>
 </html>
